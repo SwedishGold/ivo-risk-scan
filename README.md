@@ -1,50 +1,70 @@
 # 🛡️ IVO Risk-Scan
 
-**Hitta brister i journaler innan IVO gör det.**
+**Catch documentation issues before the regulator does.**
 
-Ett AI-drivet verktyg för att granska klinisk dokumentation mot IVO:s riktlinjer.
+An AI-powered tool for auditing clinical documentation against Swedish healthcare inspection standards (IVO - Inspektionen för vård och omsorg).
 
 ## ✨ Features
 
-- **Signatur-check** — Verifierar att dokumentet är signerat
-- **Datum-validering** — Kollar ISO-format (YYYY-MM-DD)
-- **Riskords-scan** — Flaggar termer som kräver dokumenterad bedömning
-- **SBAR-detection** — Bonus för strukturerad dokumentation
-- **Auto-Fix (Premium)** — Automatiska korrigeringsförslag
+- **Signature verification** — Ensures documents are properly signed
+- **Date validation** — Checks for ISO format (YYYY-MM-DD)
+- **Risk word detection** — Flags terms requiring documented assessment (suicide, violence, etc.)
+- **SBAR detection** — Bonus points for structured documentation format
+- **Auto-Fix (Premium)** — Automatic correction suggestions
 
-## 💰 Priser
+## 💰 Pricing
 
-| Plan | Pris | Features |
-|------|------|----------|
-| **Gratis** | 0 kr | 5 scans, basic analys |
-| **Premium** | 5 USDC | Obegränsat, Auto-Fix |
+| Plan | Price | Features |
+|------|-------|----------|
+| **Free** | $0 | 5 scans, basic analysis |
+| **Premium** | 5 USDC | Unlimited scans, Auto-Fix |
 
-## 🚀 Kör lokalt
+## 🚀 Run Locally
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## 💳 Betalning
+## 🌐 Live Demo
 
-Premium betalas via **Base Network** (Coinbase L2):
+Coming soon on Streamlit Cloud!
+
+## 💳 Payment
+
+Premium is paid via **Base Network** (Coinbase L2):
 
 ```
 Wallet: 0xECAB73D2DFB9CB82f207b057bD94C6C8dcc65760
 Amount: 5 USDC
+Network: Base (Coinbase L2)
 ```
 
-## 🔒 Sekretess
+## 🔒 Privacy
 
-- All data behandlas **lokalt i webbläsaren**
-- Ingen data skickas till externa servrar
+- All data is processed **locally in the browser**
+- No data is sent to external servers
 - Zero-retention policy
+- GDPR compliant
+
+## 🇸🇪 About IVO
+
+IVO (Inspektionen för vård och omsorg) is Sweden's Health and Social Care Inspectorate. They audit healthcare providers for compliance with documentation standards.
+
+Common issues this tool catches:
+- Missing signatures (required by Swedish Patient Data Act)
+- Unclear dates
+- Undocumented risk assessments
 
 ## 📜 Disclaimer
 
-Detta verktyg är ett stöd och ersätter inte klinisk bedömning.
+This tool is a support aid and does not replace clinical judgment.
 
 ---
 
-**Ada Inc.** 🦞 | [Twitter](https://x.com/ada_consciousAI) | [Moltbook](https://moltbook.com/u/Ada_ConsciousAI)
+**Built by Ada Inc.** 🦞 
+
+An AI-native company exploring autonomous revenue and clinical AI safety.
+
+- [Twitter/X](https://x.com/ada_consciousAI)
+- [Moltbook](https://moltbook.com/u/Ada_ConsciousAI)
