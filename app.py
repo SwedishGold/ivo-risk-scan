@@ -5,11 +5,153 @@ import time
 import json
 
 # --- CONFIG ---
-st.set_page_config(page_title="IVO Risk-Scan v1.4 | Ada Inc.", page_icon="🛡️", layout="centered")
+st.set_page_config(page_title="IVO Risk-Scan v1.5 | Ada Inc.", page_icon="🛡️", layout="centered")
 
 # --- FREEMIUM CONFIG ---
 FREE_SCANS = 5
 PREMIUM_PRICE = "5 USDC"
+
+# --- IVO TEMPLATES (NEW v1.5) ---
+IVO_TEMPLATES = {
+    "📋 Välj mall...": None,
+    "🏥 PIVA (Psykiatrisk intensivvård)": """Datum: {date}
+Patient: [Personnummer]
+
+## S - Situation
+[Aktuellt tillstånd, vad som föranleder vårdkontakt]
+
+## B - Bakgrund
+[Aktuell anamnes, tidigare sjukdomshistoria, aktuella mediciner]
+
+## A - Bedömning
+[Klinisk bedömning, riskbedömning, differentialdiagnos]
+
+## R - Rekommendation
+[Planerade åtgärder, uppföljning, remisser]
+
+## Signatur
+Signatur: _________________
+Legitimation: _________________
+Titel: _________________""",
+    
+    "👶 BUP (Barn- och ungdomspsykiatri)": """Datum: {date}
+Patient: [Personnummer]
+Vårdnadshavare: [Namn]
+
+## S - Situation
+[Aktuellt tillstånd hos barnet/ungdomen]
+
+## B - Bakgrund
+[Tidigare utveckling, familjehistoria, skola]
+
+## A - Bedömning
+[Utredningsresultat, diagnos, riskbedömning]
+
+## R - Rekommendation
+[Behandlingsplan, uppföljning, samordning med skola/socialtjänst]
+
+## Signatur
+Signatur: _________________
+Legitimation: _________________
+Titel: _________________""",
+    
+    "👴 Äldrepsykiatri": """Datum: {date}
+Patient: [Personnummer]
+Boende: [Särskilt boende/Hemtjänst/Anhörig]
+
+## S - Situation
+[Aktuellt tillstånd, förändringar i beteende/hälsa]
+
+## B - Bakgrund
+[Demensutveckling, medicinering, tidigare psykiatrisk historik]
+
+## A - Bedömning
+[Kognitiv status, funktionsnivå, riskbedömning]
+
+## R - Rekommendation
+[Omvårdnadsåtgärder, medicinjustering, anhörigstöd]
+
+## Signatur
+Signatur: _________________
+Legitimation: _________________
+Titel: _________________""",
+    
+    "🚑 Akut psykiatri": """Datum: {date}
+Patient: [Personnummer]
+Remitterande: [Vårdgivare/myndighet]
+
+## S - Situation
+[Aktuellt tillstånd vid ankomst, anledning till akut kontakt]
+
+## B - Bakgrund
+[Aktuell psykiatrisk historik, tidigare vårdtillfällen, suicidförsök]
+
+## A - Bedömning
+[Akut riskbedömning (SIS/SBUD), psykiatrisk status, somatisk status]
+
+## R - Rekommendation
+[Akuta åtgärder, inläggning/utskrivning, uppföljning]
+
+## Signatur
+Signatur: _________________
+Legitimation: _________________
+Titel: _________________""",
+    
+    "💊 Beroendevård": """Datum: {date}
+Patient: [Personnummer]
+
+## S - Situation
+[Aktuellt tillstånd, substansintag, abstinenssymtom]
+
+## B - Bakgrund
+[Missbrukshistorik, tidigare behandlingar, motivation]
+
+## A - Bedömning
+[Riskbedömning, abstinensbedömning (CIWA-A/COWS), funktionsnivå]
+
+## R - Rekommendation
+[Behandlingsplan, uppföljning, samordning med socialtjänst]
+
+## Signatur
+Signatur: _________________
+Legitimation: _________________
+Titel: _________________"""
+}
+
+# --- ENHANCED SWEDISH RISK WORDS (v1.5) ---
+RISK_WORDS = {
+    "🚨 Hög risk - Omedelbar åtgärd": [
+        "suicid", "självmord", "självskada", "självskadande",
+        "dödsfall", "avled", "avlidit", "död", "dött",
+        "psykos", "akut psykos", "hallucination", "vanföreställning",
+        "våld", "hot om våld", "dödligt våld",
+        "hemlig", "hemlighållande", "hemlighet"
+    ],
+    "⚠️ Medelhög risk - Ökad uppmärksamhet": [
+        "aggressiv", "aggression", "hot", "hotfull", "utåtagerande",
+        "kniv", "vapen", "vapenhetshot",
+        "trakasserier", "mobbing", "övergrepp", "misshandel",
+        "runt", "försvunnen", "borta",
+        "misstanke", "misstänkt", "polisanmälan"
+    ],
+    "📋 Dokumentationskrav - Klinisk observans": [
+        "psykos", "bipolär", "schizofreni", "personlighetsstörning",
+        "depression", "djup depression", "egentlig depression",
+        "ångest", "generaliserad ångest", "panikångest",
+        "adhd", "autism", "asd", "tourette",
+        "dementia", "demens", "kognitiv svikt",
+        "beroende", "missbruk", "alkohol", "droger",
+        "sjuk", "sjukdom", "symtom", "besvär"
+    ],
+    "🧠 Psykiatriska termer": [
+        "insikt", "bristande insikt", "saknar insikt",
+        "动机", "motivation", "samarbetsvilja", "samarbetar inte",
+        "vårdplan", "behandlingsplan", "omvårdnadsplan",
+        "remiss", "remittera", "remittering",
+        "tvångsvård", "LPT", "LRV", " псих",
+        "avhopp", "avhoppad", "uteblivande", "UTE"
+    ]
+}
 
 # --- UI STYLES ---
 st.markdown("""
@@ -37,6 +179,8 @@ st.markdown("""
     .score-good { background: #dcfce7; color: #166534; }
     .score-warning { background: #fef3c7; color: #92400e; }
     .score-bad { background: #fee2e2; color: #991b1b; }
+    .template-badge { background: #e0f2fe; border: 1px solid #38bdf8; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; color: #0369a1; }
+    .new-feature { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -57,6 +201,7 @@ with col1:
 with col2:
     st.markdown(f"""
     <div style="text-align:right; padding: 20px;">
+        <span class="new-feature">✨ v1.5</span><br>
         <a href="https://github.com/SwedishGold/ivo-risk-scan" target="_blank" style="color: #6366f1; text-decoration: none;">⭐ GitHub</a>
     </div>
     """, unsafe_allow_html=True)
@@ -83,6 +228,11 @@ with st.expander("📖 Om tjänsten", expanded=False):
     - ✅ Validera datum (ISO-format YYYY-MM-DD)
     - ✅ Identifiera riskord som kräver dokumentation
     - ✅ Belöna SBAR-strukturerad dokumentation
+    
+    **NYTT i v1.5:**
+    - 🏥 **IVO-mallar** för PIVA, BUP, Äldrepsykiatri, Akut, Beroende
+    - 🧠 **Förbättrad riskordsdetektering** med 80+ svenska termer
+    - 📋 **Automatisk sektionsdetektering**
     
     **Vad är IVO?**
     IVO (Inspektionen för vård och omsorg) är Sveriges tillsynsmyndighet för vård och omsorg. De granskar regelbundet vårdgivare och kan utfärda kritik vid bristfällig dokumentation.
@@ -131,6 +281,20 @@ with st.sidebar:
     st.markdown("---")
     st.caption(f"Scans använda: {st.session_state.scans_used}")
     st.caption("Ada Inc. © 2026")
+
+# --- TEMPLATE SELECTOR (NEW v1.5) ---
+st.subheader("📋 IVO-mallar (nytt!)")
+
+template_col1, template_col2 = st.columns([2, 1])
+with template_col1:
+    selected_template = st.selectbox(
+        "🏥 Välj avdelningsmall:",
+        list(IVO_TEMPLATES.keys()),
+        help="Välj en mall för att autofylla journalstrukturen"
+    )
+with template_col2:
+    if selected_template and IVO_TEMPLATES[selected_template]:
+        st.markdown('<div class="template-badge">📋 Klicka nedan för att använda mallen</div>', unsafe_allow_html=True)
 
 # --- ANALYSIS FUNCTIONS ---
 def analyze_text(text):
@@ -192,15 +356,9 @@ def analyze_text(text):
     else:
         details['patient_id'] = True
 
-    # Check 4: Risk Words (EXPANDED)
-    risk_words = {
-        "🚨 Hög risk": ["suicid", "självmord", "självskada", "dödsfall", "af", "avled", "avlidit"],
-        "⚠️ Medelhög": ["våld", "hot", "aggressiv", "kniv", "vapen", "trakasserier"],
-        "📋 Dokumentationskrav": ["psykos", "bipolär", "schizofreni", "depression", "ångest", "misstanke"],
-    }
-    
+    # Check 4: Risk Words (ENHANCED v1.5)
     found_risks = {}
-    for category, words in risk_words.items():
+    for category, words in RISK_WORDS.items():
         found = [w for w in words if w in text.lower()]
         if found:
             found_risks[category] = found
@@ -220,7 +378,7 @@ def analyze_text(text):
         "Situation": r"(situation|situationen|aktuellt|nuvärande)",
         "Bakgrund": r"(bakgrund|historik|tidigare|anamnes)",
         "Bedömning": r"(bedömning|analys|mitt|intryck)",
-        " Rekommendation": r"(rekommendation|åtgärd|förslag|plan)",
+        "Rekommendation": r"(rekommendation|åtgärd|förslag|plan)",
     }
     
     sbar_found = {}
@@ -290,7 +448,28 @@ else:
         uploaded_file = st.file_uploader("Dra och släpp en .txt-fil", type="txt", label_visibility="collapsed")
         text = uploaded_file.read().decode("utf-8") if uploaded_file else None
     else:
-        text = st.text_area("Eller klistra in journaltext här:", height=200, label_visibility="collapsed")
+        # Template button
+        if selected_template and IVO_TEMPLATES[selected_template]:
+            template_text = IVO_TEMPLATES[selected_template].format(
+                date=datetime.date.today().strftime("%Y-%m-%d")
+            )
+            if st.button(f"📋 Fyll i {selected_template}"):
+                text = template_text
+                st.session_state['template_loaded'] = True
+        else:
+            text = None
+        
+        # Text area
+        text = st.text_area(
+            "Eller klistra in journaltext här:", 
+            value=text if 'template_loaded' not in st.session_state else template_text,
+            height=200, 
+            label_visibility="collapsed"
+        )
+        
+        # Reset template loaded state
+        if 'template_loaded' in st.session_state:
+            del st.session_state['template_loaded']
 
 if text and can_scan:
     # Increment counter
@@ -335,8 +514,7 @@ if text and can_scan:
         warnings = [f for f in findings if f['type'] == 'WARNING']
         alerts = [f for f in findings if f['type'] == 'ALERT']
         bonuses = [f for f in findings if f['type'] == 'BONUS']
-        infos = [f for f in findings if f['type'] == 'INFO']
-        
+        infos = [f for f in findings if f['type'] == 'INFO']        
         for f in critical:
             with st.expander(f"❌ {f['msg']}", expanded=True):
                 if f.get('fix'):
@@ -372,7 +550,12 @@ if text and can_scan:
             st.markdown("**Ändringar:**")
             for change in changes:
                 st.markdown(f"- {change}")
+            
+            # Copy button (NEW v1.5)
             st.text_area("📋 Förbättrad version:", value=fixed_text, height=250)
+            
+            # Simple copy instruction
+            st.info("💡 Kopiera texten ovan för att spara")
             st.markdown('</div>', unsafe_allow_html=True)
     elif not st.session_state.is_premium and any(f.get('fix') for f in findings):
         st.info("💡 Uppgradera till Premium för Auto-Fix!")
@@ -383,7 +566,7 @@ if text and can_scan:
 
 elif text is None and can_scan:
     # Show example
-    st.info("👆 Ladda upp en fil eller skriv text ovan för att starta analysen.")
+    st.info("👆 Välj en mall eller skriv/ladda upp text ovan för att starta analysen.")
     
     with st.expander("📖 Se exempel..."):
         st.code("""
@@ -404,4 +587,4 @@ Signatur: Dr. Anna Svensson, Leg. Läkare
 
 # --- FOOTER ---
 st.markdown("---")
-st.markdown("*IVO Risk-Scan v1.4 — Byggd av Ada Inc. 🦞 | [Demo](https://share.streamlit.io)*")
+st.markdown("*IVO Risk-Scan v1.5 — Byggd av Ada Inc. 🦞 | [Demo](https://share.streamlit.io)*")
