@@ -272,11 +272,13 @@ st.markdown("""
     .ai-badge { background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%); color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: bold; }
     .requirement-box { background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 8px; margin: 8px 0; }
     .requirement-title { font-weight: bold; }
-    .finding-item { background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; margin: 8px 0; }
-    .finding-critical { border-left: 4px solid #ef4444; }
-    .finding-warning { border-left: 4px solid #f59e0b; }
-    .finding-good { border-left: 4px solid #10b981; }
-    .finding-info { border-left: 4px solid #3b82f6; }
+    .finding-item { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; margin: 8px 0; }
+    .finding-critical { border-left: 4px solid #ef4444; background: #fef2f2; }
+    .finding-warning { border-left: 4px solid #f59e0b; background: #fffbeb; }
+    .finding-good { border-left: 4px solid #10b981; background: #ecfdf5; }
+    .finding-info { border-left: 4px solid #3b82f6; background: #eff6ff; }
+    .finding-item div { color: #1f2937 !important; }
+    .finding-item div:first-child { font-weight: bold; }
     .process-badge { background: #e0f2fe; border: 1px solid #38bdf8; padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; color: #0369a1; display: inline-block; margin: 2px; }
 </style>
 """, unsafe_allow_html=True)
@@ -648,23 +650,23 @@ if text and can_scan:
             if f['type'] == 'CRITICAL':
                 st.markdown(f'''
                 <div class="finding-item finding-critical">
-                    <div class="requirement-title" style="color:#ef4444;">❌ {f['area']} - KRITISKT</div>
-                    <div>{f['message']}</div>
+                    <div class="requirement-title" style="color:#991b1b !important;font-weight:bold;">❌ {f['area']} - KRITISKT</div>
+                    <div style="color:#1f2937 !important;">{f['message']}</div>
                     <div style="font-size:0.75rem;color:#666;margin-top:4px;">📋 {f.get('ivo_ref', '')}</div>
                 </div>
                 ''', unsafe_allow_html=True)
             elif f['type'] == 'WARNING':
                 st.markdown(f'''
                 <div class="finding-item finding-warning">
-                    <div class="requirement-title" style="color:#f59e0b;">⚠️ {f['area']}</div>
-                    <div>{f['message']}</div>
+                    <div class="requirement-title" style="color:#92400e !important;font-weight:bold;">⚠️ {f['area']}</div>
+                    <div style="color:#1f2937 !important;">{f['message']}</div>
                 </div>
                 ''', unsafe_allow_html=True)
             elif f['type'] == 'GOOD':
                 st.markdown(f'''
                 <div class="finding-item finding-good">
-                    <div class="requirement-title" style="color:#10b981;">✅ {f['area']}</div>
-                    <div>{f['message']}</div>
+                    <div class="requirement-title" style="color:#065f46 !important;font-weight:bold;">✅ {f['area']}</div>
+                    <div style="color:#1f2937 !important;">{f['message']}</div>
                 </div>
                 ''', unsafe_allow_html=True)
         
